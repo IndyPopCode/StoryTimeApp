@@ -1,7 +1,6 @@
 package com.example.storytime
 
 import android.content.Intent
-import android.drm.DrmStore.RightsStatus
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -14,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -24,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bookListAdapter: BookListAdapter
     private lateinit var linearlayoutManager: LinearLayoutManager
     private lateinit var db : AppDatabase
-    private var milestone: Double = 100.0
+    var milestone: Double = 1000.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,17 +88,17 @@ class MainActivity : AppCompatActivity() {
             bookList = db.bookListDao().getAll()
 
             runOnUiThread {
-              updateTotalTime()
+              updateTotalTime(bookList)
                 bookListAdapter.setData(bookList)
 
             }
         }
     }
 
-    private fun updateTotalTime(){
-        val totalAmount = bookList.map {it.amount }.sum()
+    fun updateTotalTime(bookList: List<BookList>) {
+        val totalAmount = this.bookList.map {it.amount }.sum()
 
-        findViewById<TextView>(R.id.totalTime).text = "%.1f Min".format(totalAmount)
+        findViewById<TextView>(R.id.totalTime).text = "%.2f Min".format(totalAmount)
 
         if (totalAmount >= milestone) {
             val builder = AlertDialog.Builder(this)
@@ -122,7 +120,7 @@ class MainActivity : AppCompatActivity() {
 
             bookList = bookList.filter {it.id !=bookLists.id  }
             runOnUiThread{
-                updateTotalTime()
+                updateTotalTime(bookList)
 
             }
         }
